@@ -16,27 +16,14 @@ app = typer.Typer(help="BibSanity - Sanity checks for BibTeX entries")
 console = Console()
 
 
-@app.command()
-def check(
-    file: Path = typer.Argument(..., help="Path to .bib file"),
-    json: Optional[Path] = typer.Option(
-        None, "--json", "-j", help="Path for JSON report (default: xxx_report.json)"
-    ),
-    out: Optional[Path] = typer.Option(
-        None, "--out", "-o", help="Path for HTML report (deprecated, use --format instead)"
-    ),
-    format: Optional[str] = typer.Option(
-        None, "--format", "-f", help="Output format: json, html, pdf, or all (default: json)"
-    ),
-    max_workers: int = typer.Option(
-        6, "--max-workers", "-w", help="Maximum concurrent workers"
-    ),
-    strict: bool = typer.Option(
-        False, "--strict", "-s", help="Use strict verification mode"
-    ),
-    no_cache: bool = typer.Option(
-        False, "--no-cache", help="Disable caching"
-    ),
+def _run_check(
+    file: Path,
+    json: Optional[Path],
+    out: Optional[Path],
+    format: Optional[str],
+    max_workers: int,
+    strict: bool,
+    no_cache: bool,
 ):
     """Check BibTeX file for sanity issues."""
     # Validate input file
@@ -84,10 +71,10 @@ def check(
             transient=False,
         ) as progress:
             task = progress.add_task(
-                "[cyan]Verifying...", 
+                "[cyan]Verifying...",
                 total=len(entries)
             )
-            
+
             def update_progress(completed: int, total: int, entry_id: str):
                 """Update progress bar with current entry info."""
                 # Rich Progress is thread-safe and can be updated from async context
@@ -96,13 +83,13 @@ def check(
                     completed=completed,
                     description=f"[cyan]Verifying...[/cyan] [dim]{entry_id}[/dim]"
                 )
-            
+
             # Run verification with progress callback
             async def verify_with_progress():
                 return await verifier.verify_entries(entries, progress_callback=update_progress)
-            
+
             results = asyncio.run(verify_with_progress())
-            
+
             # Final update to show completion
             progress.update(task, completed=len(entries), description="[green]✓ Verification complete[/green]")
     except Exception as e:
@@ -118,14 +105,14 @@ def check(
     # Determine base name from input file (without .bib extension)
     file_stem = file_path.stem  # e.g., "test_refs" from "test_refs.bib"
     file_dir = file_path.parent  # Directory of the input file
-    
+
     # Create Sanity_Report folder in the same directory as input file
     report_dir = file_dir / "Sanity_Report"
     report_dir.mkdir(exist_ok=True)  # Create if doesn't exist, do nothing if exists
 
     # Determine output formats
     formats_to_generate = set()
-    
+
     # Handle --format option
     if format:
         format_lower = format.lower()
@@ -142,7 +129,7 @@ def check(
         # If user provided just a filename without path, put it in report dir
         if not out_path.is_absolute() and out_path.parent == Path("."):
             out_path = report_dir / out_path.name
-        
+
         # Determine format from extension
         ext = out_path.suffix.lower()
         if ext == ".html":
@@ -160,11 +147,11 @@ def check(
     # If --format is used, only generate JSON if it's in the format list
     # Otherwise (default or --out), always generate JSON
     should_generate_json = (
-        "json" in formats_to_generate 
+        "json" in formats_to_generate
         or (not format and not out)  # Default: no --format and no --out
         or (out and not format)      # --out without --format (backward compat)
     )
-    
+
     if should_generate_json:
         if json:
             # User specified custom path
@@ -185,6 +172,41 @@ def check(
         raise typer.Exit(1)
     else:
         raise typer.Exit(0)
+
+
+@app.callback(invoke_without_command=True)
+def main(
+    file: Path = typer.Argument(..., help="Path to .bib file"),
+    json: Optional[Path] = typer.Option(
+        None, "--json", "-j", help="Path for JSON report (default: xxx_report.json)"
+    ),
+    out: Optional[Path] = typer.Option(
+        None, "--out", "-o", help="Path for HTML report (deprecated, use --format instead)"
+    ),
+    format: Optional[str] = typer.Option(
+        None, "--format", "-f", help="Output format: json, html, pdf, or all (default: json)"
+    ),
+    max_workers: int = typer.Option(
+        6, "--max-workers", "-w", help="Maximum concurrent workers"
+    ),
+    strict: bool = typer.Option(
+        False, "--strict", "-s", help="Use strict verification mode"
+    ),
+    no_cache: bool = typer.Option(
+        False, "--no-cache", help="Disable caching"
+    ),
+):
+    """Check BibTeX file for sanity issues."""
+    _run_check(
+        file=file,
+        json=json,
+        out=out,
+        format=format,
+        max_workers=max_workers,
+        strict=strict,
+        no_cache=no_cache,
+    )
+
 
 
 if __name__ == "__main__":

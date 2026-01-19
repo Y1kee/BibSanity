@@ -15,16 +15,26 @@ A CLI tool to sanity-check BibTeX entries and flag likely invalid citations or i
 
 ## Installation
 
-From source (recommended for now):
+From PyPI:
 
 ```bash
+pip install bibsanity
+```
+
+From source:
+
+```bash
+git clone https://github.com/<your-username>/<repo>.git
+cd BibSanity
+python -m venv .venv
+source .venv/bin/activate
 pip install -e .
 ```
 
 ## Quickstart
 
 ```bash
-bibsanity check examples/test_refs.bib
+bibsanity examples/test_refs.bib
 ```
 
 ### Options
@@ -40,19 +50,19 @@ bibsanity check examples/test_refs.bib
 
 ```bash
 # Basic check (generates JSON report in Sanity_Report folder)
-bibsanity check examples/test_refs.bib
+bibsanity examples/test_refs.bib
 
 # Generate HTML report
-bibsanity check references.bib --format html
+bibsanity references.bib --format html
 
 # Generate all formats (JSON + HTML)
-bibsanity check references.bib --format all
+bibsanity references.bib --format all
 
 # Custom JSON report path
-bibsanity check references.bib --json custom_report.json
+bibsanity references.bib --json custom_report.json
 
 # Strict mode with more workers
-bibsanity check references.bib --strict --max-workers 10
+bibsanity references.bib --strict --max-workers 10
 ```
 
 ### Report Location
