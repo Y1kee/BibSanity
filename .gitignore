@@ -1,0 +1,37 @@
+# Python bytecode / caches
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+.env/
+
+# Build / packaging artifacts
+build/
+dist/
+*.egg-info/
+pip-wheel-metadata/
+
+# Test / coverage artifacts
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+
+# Editor / OS cruft
+.DS_Store
+.idea/
+.vscode/
+
+# Project-generated reports
+Sanity_Report/
+report.html
