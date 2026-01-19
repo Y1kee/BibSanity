@@ -24,7 +24,7 @@ pip install -e .
 ## Quickstart
 
 ```bash
-bibsanity check references.bib
+bibsanity check examples/test_refs.bib
 ```
 
 ### Options
@@ -40,7 +40,7 @@ bibsanity check references.bib
 
 ```bash
 # Basic check (generates JSON report in Sanity_Report folder)
-bibsanity check references.bib
+bibsanity check examples/test_refs.bib
 
 # Generate HTML report
 bibsanity check references.bib --format html

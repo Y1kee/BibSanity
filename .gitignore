@@ -35,3 +35,6 @@ htmlcov/
 # Project-generated reports
 Sanity_Report/
 report.html
+
+# Local-only test files
+local_test_bib/
